@@ -1,5 +1,6 @@
 package com.example.blackhorsesep.controller;
 
+import static com.example.blackhorsesep.TestData.initResourceModelList;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
 import static com.example.blackhorsesep.exception.ErrorCodeConstant.PARAM_VALIDATE_FAILURE;
@@ -14,11 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.blackhorsesep.model.ResourceModel;
 import com.example.blackhorsesep.service.ResourceService;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,7 +37,7 @@ class ResourceControllerTest {
   void should_return_200_and_8_resources_when_get_resource_given_8_resources_from_service() {
     String resourceId = "1";
     int resourceNum = 8;
-    List<ResourceModel> resourceModelList = initResourceModelWithGivenNumber(resourceNum);
+    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
     when(resourceService.getResources(eq(resourceId), anyInt(), anyInt()))
         .thenReturn(resourceModelList);
 
@@ -67,28 +64,5 @@ class ResourceControllerTest {
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.errorCode", equalTo(PARAM_VALIDATE_FAILURE)));
-  }
-
-  private List<ResourceModel> initResourceModelWithGivenNumber(int num) {
-    if (num <= 0) {
-      return Collections.emptyList();
-    }
-
-    return Stream.iterate(0, i -> i + 1)
-        .limit(num)
-        .map(i -> initResourceModel("Resource " + i))
-        .toList();
-  }
-
-  private ResourceModel initResourceModel(String name) {
-    LocalDateTime now = LocalDateTime.now();
-    Random randomGenerator = new Random();
-    int maxSeconds = 1000;
-
-    return ResourceModel.builder()
-        .resourceName(name)
-        .createDate(now.plusSeconds(randomGenerator.nextInt(maxSeconds)))
-        .updatedDate(now.plusSeconds(randomGenerator.nextInt(maxSeconds)))
-        .build();
   }
 }
