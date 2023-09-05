@@ -3,6 +3,7 @@ package com.example.blackhorsesep.controller;
 import static com.example.blackhorsesep.TestData.initResourceModelList;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
+import static com.example.blackhorsesep.constant.Constant.URL_PATH;
 import static com.example.blackhorsesep.exception.ErrorCodeConstant.PARAM_VALIDATE_FAILURE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ResourceController.class)
 class ResourceControllerTest {
+  private final String resourceId = "1";
 
   @Autowired MockMvc mockMvc;
 
@@ -35,7 +37,6 @@ class ResourceControllerTest {
   @SneakyThrows
   @Test
   void should_return_200_and_8_resources_when_get_resource_given_8_resources_from_service() {
-    String resourceId = "1";
     int resourceNum = 8;
     List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
     when(resourceService.getResources(eq(resourceId), anyInt(), anyInt()))
@@ -43,7 +44,7 @@ class ResourceControllerTest {
 
     mockMvc
         .perform(
-            get(RESOURCE_BASE + "/" + resourceId + RESOURCES)
+            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
                 .param("pageNo", "1")
                 .param("pageSize", "10")
                 .contentType(APPLICATION_JSON))
@@ -58,7 +59,7 @@ class ResourceControllerTest {
       String pageNo, String pageSize) {
     mockMvc
         .perform(
-            get(RESOURCE_BASE + "/1" + RESOURCES)
+            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
                 .param("pageNo", pageNo)
                 .param("pageSize", pageSize)
                 .contentType(APPLICATION_JSON))
