@@ -2,10 +2,12 @@ package com.example.blackhorsesep.service;
 
 import static com.example.blackhorsesep.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import com.example.blackhorsesep.BaseUnitTest;
+import com.example.blackhorsesep.exception.CoursePlatformException;
 import com.example.blackhorsesep.integration.CoursePlatformClient;
 import com.example.blackhorsesep.model.ResourceModel;
 import java.util.List;
@@ -53,5 +55,16 @@ class ResourceServiceTest extends BaseUnitTest {
         resourceService.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
 
     assertThat(resources).hasSize(resourceNum);
+  }
+
+  @Test
+  void should_throw_CoursePlatformException_when_get_resource_given_exception_from_integration() {
+    when(coursePlatformClient.getResources(anyString(), anyInt(), anyInt()))
+        .thenThrow(new CoursePlatformException("server error"));
+
+    assertThrows(
+        CoursePlatformException.class,
+        () ->
+            resourceService.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE));
   }
 }
