@@ -42,4 +42,16 @@ class ResourceServiceTest extends BaseUnitTest {
 
     assertThat(resources).hasSize(resourceNum);
   }
+
+  @Test
+  void should_return_0_resources_when_get_resource_given_0_resources_from_integration() {
+    int resourceNum = 0;
+    when(coursePlatformClient.getResources(anyString(), anyInt(), anyInt()))
+        .thenReturn(initResourceModelList(resourceNum));
+
+    List<ResourceModel> resources =
+        resourceService.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
+
+    assertThat(resources).hasSize(resourceNum);
+  }
 }
