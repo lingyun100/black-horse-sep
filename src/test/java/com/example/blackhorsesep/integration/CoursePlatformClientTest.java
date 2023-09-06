@@ -68,4 +68,23 @@ class CoursePlatformClientTest extends BaseIntegrationTest {
         coursePlatformClient.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
     assertThat(resources).hasSize(resourcesNum);
   }
+
+  @Test
+  @SneakyThrows
+  void should_return_0_resources_when_get_resources_given_0_resources_from_fake_course_platform() {
+    int resourcesNum = 0;
+    List<ResourceModel> resourceModelList = initResourceModelList(resourcesNum);
+    mockServerClient
+        .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
+        .respond(
+            response()
+                .withStatusCode(HttpStatus.OK.value())
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withBody(objectMapper.writeValueAsString(resourceModelList))
+                .withDelay(TimeUnit.MILLISECONDS, DEFAULT_DELAY_MILLISECONDS));
+
+    List<ResourceModel> resources =
+        coursePlatformClient.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
+    assertThat(resources).hasSize(resourcesNum);
+  }
 }
