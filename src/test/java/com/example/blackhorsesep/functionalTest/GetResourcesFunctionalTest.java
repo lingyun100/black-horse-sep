@@ -1,6 +1,6 @@
 package com.example.blackhorsesep.functionalTest;
 
-import static com.example.blackhorsesep.TestData.initResourceModelList;
+import static com.example.blackhorsesep.TestData.*;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
 import static com.example.blackhorsesep.constant.Constant.URL_PATH;
@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,26 +37,49 @@ class GetResourcesFunctionalTest extends BaseIntegrationTest {
   @Autowired CoursePlatformClient coursePlatformClient;
   @Autowired ResourceService resourceService;
 
+  @AfterEach
+  void tearDown() {
+    mockServerClient.reset();
+  }
+
   @Test
   @SneakyThrows
   void should_return_8_resources_when_get_resources_given_8_resources_from_fake_course_platform() {
-    prepareResourcesWhenCallCoursePlatformAPI();
+    int resourceNum = 8;
+    prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
 
     mockMvc
         .perform(
-            get(RESOURCE_BASE + URL_PATH + "1" + RESOURCES)
-                .param("pageNo", "1")
-                .param("pageSize", "10")
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(8)));
+        .andExpect(jsonPath("$", hasSize(resourceNum)));
   }
 
-  private void prepareResourcesWhenCallCoursePlatformAPI() throws JsonProcessingException {
-    List<ResourceModel> resourceModelList = initResourceModelList(8);
+  @Test
+  @SneakyThrows
+  void
+      should_return_10_resources_when_get_resources_given_10_resources_from_fake_course_platform() {
+    int resourceNum = 10;
+    prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
+
+    mockMvc
+        .perform(
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
+                .contentType(APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(resourceNum)));
+  }
+
+  private void prepareResourcesWhenCallCoursePlatformAPI(int resourceNum)
+      throws JsonProcessingException {
+    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
     mockServerClient
-        .when(
-            request().withMethod(GET.name()).withPath("/course-platform/1/resources"), unlimited())
+        .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
         .respond(
             response()
                 .withStatusCode(200)

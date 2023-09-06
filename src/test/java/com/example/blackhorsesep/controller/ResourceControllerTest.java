@@ -1,6 +1,6 @@
 package com.example.blackhorsesep.controller;
 
-import static com.example.blackhorsesep.TestData.initResourceModelList;
+import static com.example.blackhorsesep.TestData.*;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
 import static com.example.blackhorsesep.constant.Constant.URL_PATH;
@@ -29,16 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(ResourceController.class)
 class ResourceControllerTest {
 
-  private static final String PAGE_NO_KEY = "pageNo";
-
-  private static final String PAGE_SIZE_KEY = "pageSize";
-
-  private static final String DEFAULT_PAGE_NO = "1";
-
-  private static final String DEFAULT_PAGE_SIZE = "10";
-
-  private static final String DEFAULT_RESOURCE_ID = "1";
-
   @Autowired MockMvc mockMvc;
 
   @MockBean ResourceService resourceService;
@@ -54,8 +44,8 @@ class ResourceControllerTest {
     mockMvc
         .perform(
             get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
-                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO)
-                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(resourceNum)));
@@ -87,8 +77,8 @@ class ResourceControllerTest {
     mockMvc
         .perform(
             get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
-                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO)
-                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(resourceNum)));

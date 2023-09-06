@@ -1,6 +1,6 @@
 package com.example.blackhorsesep.integration;
 
-import static com.example.blackhorsesep.TestData.initResourceModelList;
+import static com.example.blackhorsesep.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
@@ -20,17 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 class CoursePlatformClientTest extends BaseIntegrationTest {
-
-  private static final int DEFAULT_PAGE_NO = 1;
-
-  private static final int DEFAULT_PAGE_SIZE = 10;
-
-  private static final int DEFAULT_DELAY_MILLISECONDS = 1000;
-
-  private static final String DEFAULT_RESOURCE_ID = "1";
-
-  private static final String COURSE_PLATFORM_URL =
-      "/course-platform/" + DEFAULT_RESOURCE_ID + "/resources";
 
   @Autowired CoursePlatformClient coursePlatformClient;
 

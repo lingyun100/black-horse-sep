@@ -1,6 +1,6 @@
 package com.example.blackhorsesep.service;
 
-import static com.example.blackhorsesep.TestData.initResourceModelList;
+import static com.example.blackhorsesep.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -14,12 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 class ResourceServiceTest extends BaseUnitTest {
-
-  private static final int DEFAULT_PAGE_NO = 1;
-
-  private static final int DEFAULT_PAGE_SIZE = 10;
-
-  private static final String DEFAULT_RESOURCE_ID = "1";
 
   @Mock private CoursePlatformClient coursePlatformClient;
 
