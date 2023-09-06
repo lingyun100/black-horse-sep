@@ -83,4 +83,22 @@ class ResourceControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(resourceNum)));
   }
+
+  @SneakyThrows
+  @Test
+  void should_return_200_and_0_resources_when_get_resource_given_0_resources_from_service() {
+    int resourceNum = 0;
+    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
+    when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
+        .thenReturn(resourceModelList);
+
+    mockMvc
+        .perform(
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
+                .contentType(APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(resourceNum)));
+  }
 }
