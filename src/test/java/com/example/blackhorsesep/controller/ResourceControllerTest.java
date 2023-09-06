@@ -66,4 +66,22 @@ class ResourceControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.errorCode", equalTo(PARAM_VALIDATE_FAILURE)));
   }
+
+  @SneakyThrows
+  @Test
+  void should_return_200_and_10_resources_when_get_resource_given_10_resources_from_service() {
+    int resourceNum = 10;
+    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
+    when(resourceService.getResources(eq(resourceId), anyInt(), anyInt()))
+        .thenReturn(resourceModelList);
+
+    mockMvc
+        .perform(
+            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
+                .param("pageNo", "1")
+                .param("pageSize", "10")
+                .contentType(APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(resourceNum)));
+  }
 }
