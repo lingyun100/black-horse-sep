@@ -75,6 +75,22 @@ class GetResourcesFunctionalTest extends BaseIntegrationTest {
         .andExpect(jsonPath("$", hasSize(resourceNum)));
   }
 
+  @Test
+  @SneakyThrows
+  void should_return_0_resources_when_get_resources_given_0_resources_from_fake_course_platform() {
+    int resourceNum = 0;
+    prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
+
+    mockMvc
+        .perform(
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
+                .contentType(APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(resourceNum)));
+  }
+
   private void prepareResourcesWhenCallCoursePlatformAPI(int resourceNum)
       throws JsonProcessingException {
     List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
