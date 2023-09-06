@@ -15,6 +15,10 @@ import org.mockito.Mock;
 
 class ResourceServiceTest extends BaseUnitTest {
 
+  private static final int DEFAULT_PAGE_NO = 1;
+
+  private static final int DEFAULT_PAGE_SIZE = 10;
+
   @Mock private CoursePlatformClient coursePlatformClient;
 
   @InjectMocks private ResourceService resourceService;
@@ -24,8 +28,21 @@ class ResourceServiceTest extends BaseUnitTest {
     when(coursePlatformClient.getResources(anyString(), anyInt(), anyInt()))
         .thenReturn(initResourceModelList(8));
 
-    List<ResourceModel> resources = resourceService.getResources("1", 1, 10);
+    List<ResourceModel> resources =
+        resourceService.getResources("1", DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
 
     assertThat(resources).hasSize(8);
+  }
+
+  @Test
+  void should_return_10_resources_when_get_resource_given_10_resources_from_integration() {
+    int resourceNum = 10;
+    when(coursePlatformClient.getResources(anyString(), anyInt(), anyInt()))
+        .thenReturn(initResourceModelList(resourceNum));
+
+    List<ResourceModel> resources =
+        resourceService.getResources("1", DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
+
+    assertThat(resources).hasSize(resourceNum);
   }
 }
