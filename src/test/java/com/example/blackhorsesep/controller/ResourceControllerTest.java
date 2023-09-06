@@ -28,7 +28,16 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ResourceController.class)
 class ResourceControllerTest {
-  private final String resourceId = "1";
+
+  private static final String PAGE_NO_KEY = "pageNo";
+
+  private static final String PAGE_SIZE_KEY = "pageSize";
+
+  private static final String DEFAULT_PAGE_NO = "1";
+
+  private static final String DEFAULT_PAGE_SIZE = "10";
+
+  private static final String DEFAULT_RESOURCE_ID = "1";
 
   @Autowired MockMvc mockMvc;
 
@@ -39,14 +48,14 @@ class ResourceControllerTest {
   void should_return_200_and_8_resources_when_get_resource_given_8_resources_from_service() {
     int resourceNum = 8;
     List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
-    when(resourceService.getResources(eq(resourceId), anyInt(), anyInt()))
+    when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
         .thenReturn(resourceModelList);
 
     mockMvc
         .perform(
-            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
-                .param("pageNo", "1")
-                .param("pageSize", "10")
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(resourceNum)));
@@ -59,9 +68,9 @@ class ResourceControllerTest {
       String pageNo, String pageSize) {
     mockMvc
         .perform(
-            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
-                .param("pageNo", pageNo)
-                .param("pageSize", pageSize)
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, pageNo)
+                .param(PAGE_SIZE_KEY, pageSize)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.errorCode", equalTo(PARAM_VALIDATE_FAILURE)));
@@ -72,14 +81,14 @@ class ResourceControllerTest {
   void should_return_200_and_10_resources_when_get_resource_given_10_resources_from_service() {
     int resourceNum = 10;
     List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
-    when(resourceService.getResources(eq(resourceId), anyInt(), anyInt()))
+    when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
         .thenReturn(resourceModelList);
 
     mockMvc
         .perform(
-            get(RESOURCE_BASE + URL_PATH + resourceId + RESOURCES)
-                .param("pageNo", "1")
-                .param("pageSize", "10")
+            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
+                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO)
+                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE)
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(resourceNum)));

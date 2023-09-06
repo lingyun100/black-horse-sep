@@ -13,31 +13,70 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 class CoursePlatformClientTest extends BaseIntegrationTest {
+
+  private static final int DEFAULT_PAGE_NO = 1;
+
+  private static final int DEFAULT_PAGE_SIZE = 10;
+
+  private static final int DEFAULT_DELAY_MILLISECONDS = 1000;
+
+  private static final String DEFAULT_RESOURCE_ID = "1";
+
+  private static final String COURSE_PLATFORM_URL =
+      "/course-platform/" + DEFAULT_RESOURCE_ID + "/resources";
 
   @Autowired CoursePlatformClient coursePlatformClient;
 
   @Autowired ObjectMapper objectMapper;
 
+  @AfterEach
+  void tearDown() {
+    mockServerClient.reset();
+  }
+
   @Test
   @SneakyThrows
   void should_return_8_resources_when_get_resources_given_8_resources_from_fake_course_platform() {
-    List<ResourceModel> resourceModelList = initResourceModelList(8);
+    int resourceNum = 8;
+    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
     mockServerClient
-        .when(
-            request().withMethod(GET.name()).withPath("/course-platform/1/resources"), unlimited())
+        .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
         .respond(
             response()
-                .withStatusCode(200)
+                .withStatusCode(HttpStatus.OK.value())
                 .withContentType(MediaType.APPLICATION_JSON)
                 .withBody(objectMapper.writeValueAsString(resourceModelList))
-                .withDelay(TimeUnit.MILLISECONDS, 1000));
+                .withDelay(TimeUnit.MILLISECONDS, DEFAULT_DELAY_MILLISECONDS));
 
-    List<ResourceModel> resources = coursePlatformClient.getResources("1", 1, 10);
-    assertThat(resources).hasSize(8);
+    List<ResourceModel> resources =
+        coursePlatformClient.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
+    assertThat(resources).hasSize(resourceNum);
+  }
+
+  @Test
+  @SneakyThrows
+  void
+      should_return_10_resources_when_get_resources_given_10_resources_from_fake_course_platform() {
+    int resourcesNum = 10;
+    List<ResourceModel> resourceModelList = initResourceModelList(resourcesNum);
+    mockServerClient
+        .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
+        .respond(
+            response()
+                .withStatusCode(HttpStatus.OK.value())
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withBody(objectMapper.writeValueAsString(resourceModelList))
+                .withDelay(TimeUnit.MILLISECONDS, DEFAULT_DELAY_MILLISECONDS));
+
+    List<ResourceModel> resources =
+        coursePlatformClient.getResources(DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE);
+    assertThat(resources).hasSize(resourcesNum);
   }
 }
