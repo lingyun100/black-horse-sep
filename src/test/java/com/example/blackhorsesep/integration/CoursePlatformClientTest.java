@@ -7,6 +7,7 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.HttpMethod.GET;
 
+import com.example.blackhorsesep.BaseIntegrationTest;
 import com.example.blackhorsesep.model.ResourceModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
