@@ -4,6 +4,8 @@ import static com.example.blackhorsesep.TestData.*;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
 import static com.example.blackhorsesep.constant.Constant.URL_PATH;
+import static com.example.blackhorsesep.exception.ErrorCodeConstant.COURSE_PLATFORM_ERROR;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
@@ -25,9 +27,12 @@ import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureMockMvc
@@ -42,10 +47,12 @@ class GetResourcesFunctionalTest extends BaseIntegrationTest {
     mockServerClient.reset();
   }
 
-  @Test
+  @ParameterizedTest
+  @ValueSource(ints = {8, 10, 0})
   @SneakyThrows
-  void should_return_8_resources_when_get_resources_given_8_resources_from_fake_course_platform() {
-    int resourceNum = 8;
+  void
+      should_return_specify_num_resources_when_get_resources_given_specify_num_resources_from_fake_course_platform(
+          int resourceNum) {
     prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
 
     mockMvc
@@ -61,9 +68,14 @@ class GetResourcesFunctionalTest extends BaseIntegrationTest {
   @Test
   @SneakyThrows
   void
-      should_return_10_resources_when_get_resources_given_10_resources_from_fake_course_platform() {
-    int resourceNum = 10;
-    prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
+      should_return_500_and_error_code_COURSE_PLATFORM_ERROR_when_get_resources_given_exception_from_fake_course_platform() {
+    mockServerClient
+        .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
+        .respond(
+            response()
+                .withStatusCode(HttpStatus.REQUEST_TIMEOUT.value())
+                .withContentType(MediaType.APPLICATION_JSON)
+                .withDelay(TimeUnit.MILLISECONDS, 9 * DEFAULT_DELAY_MILLISECONDS));
 
     mockMvc
         .perform(
@@ -71,24 +83,8 @@ class GetResourcesFunctionalTest extends BaseIntegrationTest {
                 .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
                 .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
                 .contentType(APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(resourceNum)));
-  }
-
-  @Test
-  @SneakyThrows
-  void should_return_0_resources_when_get_resources_given_0_resources_from_fake_course_platform() {
-    int resourceNum = 0;
-    prepareResourcesWhenCallCoursePlatformAPI(resourceNum);
-
-    mockMvc
-        .perform(
-            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
-                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
-                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
-                .contentType(APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(resourceNum)));
+        .andExpect(status().is5xxServerError())
+        .andExpect(jsonPath("$.errorCode", equalTo(COURSE_PLATFORM_ERROR)));
   }
 
   private void prepareResourcesWhenCallCoursePlatformAPI(int resourceNum)

@@ -9,7 +9,6 @@ import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.HttpMethod.GET;
 
 import com.example.blackhorsesep.BaseIntegrationTest;
-import com.example.blackhorsesep.exception.CoursePlatformException;
 import com.example.blackhorsesep.model.ResourceModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 
 class CoursePlatformClientTest extends BaseIntegrationTest {
 
@@ -83,7 +83,7 @@ class CoursePlatformClientTest extends BaseIntegrationTest {
   @Test
   @SneakyThrows
   void
-      should_throw_CoursePlatformException_when_get_resources_given_exception_from_fake_course_platform() {
+      should_throw_InternalServerError_when_get_resources_given_InternalServerError_from_fake_course_platform() {
     mockServerClient
         .when(request().withMethod(GET.name()).withPath(COURSE_PLATFORM_URL), unlimited())
         .respond(
@@ -93,7 +93,7 @@ class CoursePlatformClientTest extends BaseIntegrationTest {
                 .withDelay(TimeUnit.MILLISECONDS, DEFAULT_DELAY_MILLISECONDS));
 
     assertThrows(
-        CoursePlatformException.class,
+        HttpServerErrorException.InternalServerError.class,
         () ->
             coursePlatformClient.getResources(
                 DEFAULT_RESOURCE_ID, DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE));
