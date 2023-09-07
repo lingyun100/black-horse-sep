@@ -3,7 +3,6 @@ package com.example.blackhorsesep.controller;
 import static com.example.blackhorsesep.TestData.*;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
-import static com.example.blackhorsesep.constant.Constant.URL_PATH;
 import static com.example.blackhorsesep.exception.ErrorCodeConstant.COURSE_PLATFORM_ERROR;
 import static com.example.blackhorsesep.exception.ErrorCodeConstant.PARAM_VALIDATE_FAILURE;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,6 +22,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,9 +36,11 @@ class ResourceControllerTest {
   @MockBean ResourceService resourceService;
 
   @SneakyThrows
-  @Test
-  void should_return_200_and_8_resources_when_get_resource_given_8_resources_from_service() {
-    int resourceNum = 8;
+  @ParameterizedTest
+  @ValueSource(ints = {8, 10, 0})
+  void
+      should_return_200_and_specify_num_resources_when_get_resource_given_specify_num_resources_from_service(
+          int resourceNum) {
     List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
     when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
         .thenReturn(resourceModelList);
@@ -66,42 +68,6 @@ class ResourceControllerTest {
                 .contentType(APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.errorCode", equalTo(PARAM_VALIDATE_FAILURE)));
-  }
-
-  @SneakyThrows
-  @Test
-  void should_return_200_and_10_resources_when_get_resource_given_10_resources_from_service() {
-    int resourceNum = 10;
-    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
-    when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
-        .thenReturn(resourceModelList);
-
-    mockMvc
-        .perform(
-            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
-                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
-                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
-                .contentType(APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(resourceNum)));
-  }
-
-  @SneakyThrows
-  @Test
-  void should_return_200_and_0_resources_when_get_resource_given_0_resources_from_service() {
-    int resourceNum = 0;
-    List<ResourceModel> resourceModelList = initResourceModelList(resourceNum);
-    when(resourceService.getResources(eq(DEFAULT_RESOURCE_ID), anyInt(), anyInt()))
-        .thenReturn(resourceModelList);
-
-    mockMvc
-        .perform(
-            get(RESOURCE_BASE + URL_PATH + DEFAULT_RESOURCE_ID + RESOURCES)
-                .param(PAGE_NO_KEY, DEFAULT_PAGE_NO_STR)
-                .param(PAGE_SIZE_KEY, DEFAULT_PAGE_SIZE_STR)
-                .contentType(APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(resourceNum)));
   }
 
   @SneakyThrows

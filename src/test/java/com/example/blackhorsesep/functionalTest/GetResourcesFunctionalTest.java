@@ -3,7 +3,6 @@ package com.example.blackhorsesep.functionalTest;
 import static com.example.blackhorsesep.TestData.*;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCES;
 import static com.example.blackhorsesep.constant.ApiConstant.RESOURCE_BASE;
-import static com.example.blackhorsesep.constant.Constant.URL_PATH;
 import static com.example.blackhorsesep.exception.ErrorCodeConstant.COURSE_PLATFORM_ERROR;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;

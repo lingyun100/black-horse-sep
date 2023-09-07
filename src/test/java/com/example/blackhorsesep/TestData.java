@@ -25,6 +25,8 @@ public class TestData {
 
   public static final String PAGE_SIZE_KEY = "pageSize";
 
+  public static final String URL_PATH = "/";
+
   public static final String COURSE_PLATFORM_URL =
       "/course-platform/" + DEFAULT_RESOURCE_ID + "/resources";
 
