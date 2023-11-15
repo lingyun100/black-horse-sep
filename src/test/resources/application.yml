@@ -20,3 +20,6 @@ spring:
       settings:
         trace: true
         web-allow-others: true
+union_pay:
+  base:
+    path: http://localhost:8081

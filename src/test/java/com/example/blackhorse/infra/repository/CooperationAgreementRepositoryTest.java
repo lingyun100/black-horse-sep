@@ -1,7 +1,8 @@
 package com.example.blackhorse.infra.repository;
 
+import static com.example.blackhorse.TestConstants.COOPERATION_AGREEMENT_ID;
+import static com.example.blackhorse.TestConstants.ORDER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.blackhorse.infra.repository.entity.CooperationAgreementEntity;
 import com.example.blackhorse.infra.repository.entity.PayFeeEntity;
@@ -14,10 +15,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 class CooperationAgreementRepositoryTest {
-  private static final String COOPERATION_AGREEMENT_ID = "CA001";
-  private static final String ORDER_ID = "O0001";
-  private static final String SERIAL_ID = "S0001";
-
   @Autowired private CooperationAgreementRepository cooperationAgreementRepository;
 
   @Test

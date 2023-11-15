@@ -1,6 +1,7 @@
 package com.example.blackhorse.service;
 
-import static com.example.blackhorse.service.CooperationAgreementService.SUCCESS;
+import static com.example.blackhorse.TestConstants.*;
+import static com.example.blackhorse.constant.Constants.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -20,10 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class CooperationAgreementServiceTest {
-  private static final String COOPERATION_AGREEMENT_ID = "CA001";
-  private static final String ORDER_ID = "O0001";
-  private static final String SERIAL_ID = "S0001";
-
   @Mock private UnionPayClient unionPayClient;
   @Mock private CooperationAgreementRepository cooperationAgreementRepository;
   @InjectMocks private CooperationAgreementService cooperationAgreementService;

@@ -1,5 +1,6 @@
 package com.example.blackhorse.service;
 
+import static com.example.blackhorse.constant.Constants.SUCCESS;
 import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.CONFIRMED;
 
 import com.example.blackhorse.infra.repository.CooperationAgreementRepository;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CooperationAgreementService {
-
-  public static final String SUCCESS = "SUCCESS";
 
   private final CooperationAgreementRepository cooperationAgreementRepository;
 
