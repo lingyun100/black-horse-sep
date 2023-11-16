@@ -37,6 +37,26 @@ class CooperationAgreementServiceTest {
   }
 
   @Test
+  void should_return_status_NULL_when_confirmPayFee_given_NULL_data_in_DB() {
+    when(cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID))
+        .thenReturn(
+            Optional.of(
+                CooperationAgreementEntity.builder()
+                    .id(COOPERATION_AGREEMENT_ID)
+                    .payFeeEntity(
+                        PayFeeEntity.builder()
+                            .id(ORDER_ID)
+                            .status(PayFeeEntity.Status.NULL)
+                            .build())
+                    .build()));
+
+    PayFeeStatus payFeeStatus =
+        cooperationAgreementService.confirmPayFee(COOPERATION_AGREEMENT_ID, SERIAL_ID);
+
+    assertThat(payFeeStatus).isEqualTo(PayFeeStatus.NULL);
+  }
+
+  @Test
   void should_return_status_PENDING_when_confirmPayFee_given_null_from_query_transaction() {
     when(cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID))
         .thenReturn(

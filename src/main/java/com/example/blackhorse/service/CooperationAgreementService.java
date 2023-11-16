@@ -2,6 +2,7 @@ package com.example.blackhorse.service;
 
 import static com.example.blackhorse.constant.Constants.SUCCESS;
 import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.CONFIRMED;
+import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.NULL;
 
 import com.example.blackhorse.infra.repository.CooperationAgreementRepository;
 import com.example.blackhorse.infra.repository.entity.CooperationAgreementEntity;
@@ -27,10 +28,14 @@ public class CooperationAgreementService {
   public PayFeeStatus confirmPayFee(String cid, String serialId) {
     Optional<CooperationAgreementEntity> agreementEntityOpt = cooperationAgreementRepository.findById(cid);
     if (agreementEntityOpt.isEmpty()) {
-      return PayFeeStatus.NULL;
+      return payFeeStatus(NULL);
     }
 
     CooperationAgreementEntity cooperationAgreementEntity = agreementEntityOpt.get();
+
+    if(NULL == cooperationAgreementEntity.getPayFeeEntity().getStatus()){
+      return payFeeStatus(NULL);
+    }
 
     QueryTransactionResponse transactionResponse =
         unionPayClient.queryTransaction(
