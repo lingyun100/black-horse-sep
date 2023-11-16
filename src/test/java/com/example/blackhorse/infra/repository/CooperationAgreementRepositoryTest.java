@@ -19,7 +19,8 @@ class CooperationAgreementRepositoryTest {
 
   @Test
   void should_get_status_PENDING_when_findById_given_PENDING_data_in_db() {
-    prepareData();
+    PayFeeEntity.Status pendingStatus = PayFeeEntity.Status.PENDING;
+    prepareData(pendingStatus);
 
     Optional<CooperationAgreementEntity> entityOptional =
         cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID);
@@ -30,8 +31,25 @@ class CooperationAgreementRepositoryTest {
         .isEqualTo(
             CooperationAgreementEntity.builder()
                 .id(COOPERATION_AGREEMENT_ID)
-                .payFeeEntity(
-                    PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.PENDING).build())
+                .payFeeEntity(PayFeeEntity.builder().id(ORDER_ID).status(pendingStatus).build())
+                .build());
+  }
+
+  @Test
+  void should_get_status_NULL_when_findById_given_NULL_data_in_db() {
+    PayFeeEntity.Status nullStatus = PayFeeEntity.Status.NULL;
+    prepareData(nullStatus);
+
+    Optional<CooperationAgreementEntity> entityOptional =
+        cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID);
+
+    assertThat(entityOptional)
+        .get()
+        .usingRecursiveComparison()
+        .isEqualTo(
+            CooperationAgreementEntity.builder()
+                .id(COOPERATION_AGREEMENT_ID)
+                .payFeeEntity(PayFeeEntity.builder().id(ORDER_ID).status(nullStatus).build())
                 .build());
   }
 
@@ -54,12 +72,11 @@ class CooperationAgreementRepositoryTest {
         .isEqualTo(status);
   }
 
-  void prepareData() {
+  void prepareData(PayFeeEntity.Status status) {
     cooperationAgreementRepository.save(
         CooperationAgreementEntity.builder()
             .id(COOPERATION_AGREEMENT_ID)
-            .payFeeEntity(
-                PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.PENDING).build())
+            .payFeeEntity(PayFeeEntity.builder().id(ORDER_ID).status(status).build())
             .build());
   }
 }
