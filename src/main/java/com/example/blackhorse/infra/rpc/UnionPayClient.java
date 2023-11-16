@@ -38,7 +38,7 @@ public class UnionPayClient {
             .build();
   }
 
-  @Retryable(retryFor = Exception.class, backoff = @Backoff(multiplier = 2), maxAttempts = 2)
+  @Retryable(retryFor = Exception.class, backoff = @Backoff(multiplier = 2))
   public QueryTransactionResponse queryTransaction(String serialId, String orderId) {
     ResponseEntity<QueryTransactionResponse> response =
         restTemplate.postForEntity(

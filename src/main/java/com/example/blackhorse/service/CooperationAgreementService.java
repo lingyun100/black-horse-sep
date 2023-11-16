@@ -2,8 +2,7 @@ package com.example.blackhorse.service;
 
 import static com.example.blackhorse.constant.Constants.NOT_FOUND;
 import static com.example.blackhorse.constant.Constants.SUCCESS;
-import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.CONFIRMED;
-import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.NULL;
+import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.*;
 
 import com.example.blackhorse.infra.repository.CooperationAgreementRepository;
 import com.example.blackhorse.infra.repository.entity.CooperationAgreementEntity;
@@ -15,6 +14,7 @@ import com.example.blackhorse.model.PayFeeStatus;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CooperationAgreementService {
 
   private final CooperationAgreementRepository cooperationAgreementRepository;
@@ -40,19 +41,18 @@ public class CooperationAgreementService {
       return payFeeStatus(NULL);
     }
 
-    QueryTransactionResponse transactionResponse =
-        unionPayClient.queryTransaction(
-            serialId, cooperationAgreementEntity.getPayFeeEntity().getId());
-
-    if( transactionResponse == null ){
-      return PayFeeStatus.PENDING;
+    PayFeeEntity.Status waitUpdateStatus = PENDING;
+    QueryTransactionResponse transactionResponse;
+    try {
+      transactionResponse = unionPayClient.queryTransaction(serialId, cooperationAgreementEntity.getPayFeeEntity().getId());
+      if (Arrays.asList(SUCCESS, NOT_FOUND).contains(transactionResponse.getStatus())) {
+        waitUpdateStatus = getStatusFromTransactionStatus(transactionResponse.getStatus());
+      }
+    } catch (Exception e) {
+      log.error("query transaction exception", e);
     }
 
-    if (!Arrays.asList(SUCCESS,NOT_FOUND).contains(transactionResponse.getStatus())) {
-      return PayFeeStatus.PENDING;
-    }
-
-    cooperationAgreementEntity.getPayFeeEntity().setStatus(getStatusFromTransactionStatus(transactionResponse.getStatus()));
+    cooperationAgreementEntity.getPayFeeEntity().setStatus(waitUpdateStatus);
 
     return payFeeStatus(cooperationAgreementRepository.save(cooperationAgreementEntity).getPayFeeEntity().getStatus());
   }
@@ -69,7 +69,7 @@ public class CooperationAgreementService {
     return switch (transactionStatus){
       case SUCCESS ->  CONFIRMED;
       case NOT_FOUND -> NULL;
-      default -> throw new RuntimeException("invalid");
+      default -> PENDING;
     };
   }
 }

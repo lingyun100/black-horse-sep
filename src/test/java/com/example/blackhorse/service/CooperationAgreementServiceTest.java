@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientException;
 
 @ExtendWith(MockitoExtension.class)
 class CooperationAgreementServiceTest {
@@ -154,5 +155,31 @@ class CooperationAgreementServiceTest {
         cooperationAgreementService.confirmPayFee(COOPERATION_AGREEMENT_ID, SERIAL_ID);
 
     assertThat(payFeeStatus).isEqualTo(PayFeeStatus.NULL);
+  }
+
+  @Test
+  void should_return_status_PENDING_when_confirmPayFee_given_TimeoutException_queryTransaction() {
+    CooperationAgreementEntity entity =
+        CooperationAgreementEntity.builder()
+            .id(COOPERATION_AGREEMENT_ID)
+            .payFeeEntity(
+                PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.PENDING).build())
+            .build();
+    when(cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID))
+        .thenReturn(Optional.of(entity));
+    when(unionPayClient.queryTransaction(SERIAL_ID, ORDER_ID))
+        .thenThrow(new RestClientException("timeout"));
+    when(cooperationAgreementRepository.save(any()))
+        .thenReturn(
+            CooperationAgreementEntity.builder()
+                .id(COOPERATION_AGREEMENT_ID)
+                .payFeeEntity(
+                    PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.PENDING).build())
+                .build());
+
+    PayFeeStatus payFeeStatus =
+        cooperationAgreementService.confirmPayFee(COOPERATION_AGREEMENT_ID, SERIAL_ID);
+
+    assertThat(payFeeStatus).isEqualTo(PayFeeStatus.PENDING);
   }
 }
