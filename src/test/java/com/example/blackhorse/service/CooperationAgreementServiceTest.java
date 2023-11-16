@@ -1,6 +1,7 @@
 package com.example.blackhorse.service;
 
 import static com.example.blackhorse.TestConstants.*;
+import static com.example.blackhorse.constant.Constants.NOT_FOUND;
 import static com.example.blackhorse.constant.Constants.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -127,5 +128,31 @@ class CooperationAgreementServiceTest {
         cooperationAgreementService.confirmPayFee(COOPERATION_AGREEMENT_ID, SERIAL_ID);
 
     assertThat(payFeeStatus).isEqualTo(PayFeeStatus.CONFIRMED);
+  }
+
+  @Test
+  void should_return_status_NULL_when_confirmPayFee_given_null_status_after_save() {
+    CooperationAgreementEntity entity =
+        CooperationAgreementEntity.builder()
+            .id(COOPERATION_AGREEMENT_ID)
+            .payFeeEntity(
+                PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.PENDING).build())
+            .build();
+    when(cooperationAgreementRepository.findById(COOPERATION_AGREEMENT_ID))
+        .thenReturn(Optional.of(entity));
+    when(unionPayClient.queryTransaction(SERIAL_ID, ORDER_ID))
+        .thenReturn(QueryTransactionResponse.builder().status(NOT_FOUND).build());
+    when(cooperationAgreementRepository.save(any()))
+        .thenReturn(
+            CooperationAgreementEntity.builder()
+                .id(COOPERATION_AGREEMENT_ID)
+                .payFeeEntity(
+                    PayFeeEntity.builder().id(ORDER_ID).status(PayFeeEntity.Status.NULL).build())
+                .build());
+
+    PayFeeStatus payFeeStatus =
+        cooperationAgreementService.confirmPayFee(COOPERATION_AGREEMENT_ID, SERIAL_ID);
+
+    assertThat(payFeeStatus).isEqualTo(PayFeeStatus.NULL);
   }
 }

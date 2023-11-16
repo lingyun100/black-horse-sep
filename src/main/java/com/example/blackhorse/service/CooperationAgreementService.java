@@ -1,5 +1,6 @@
 package com.example.blackhorse.service;
 
+import static com.example.blackhorse.constant.Constants.NOT_FOUND;
 import static com.example.blackhorse.constant.Constants.SUCCESS;
 import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.CONFIRMED;
 import static com.example.blackhorse.infra.repository.entity.PayFeeEntity.Status.NULL;
@@ -10,6 +11,8 @@ import com.example.blackhorse.infra.repository.entity.PayFeeEntity;
 import com.example.blackhorse.infra.rpc.UnionPayClient;
 import com.example.blackhorse.infra.rpc.response.QueryTransactionResponse;
 import com.example.blackhorse.model.PayFeeStatus;
+
+import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,12 +44,17 @@ public class CooperationAgreementService {
         unionPayClient.queryTransaction(
             serialId, cooperationAgreementEntity.getPayFeeEntity().getId());
 
-    if (transactionResponse != null && SUCCESS.equals(transactionResponse.getStatus())) {
-      cooperationAgreementEntity.getPayFeeEntity().setStatus(CONFIRMED);
-      return payFeeStatus(cooperationAgreementRepository.save(cooperationAgreementEntity).getPayFeeEntity().getStatus());
+    if( transactionResponse == null ){
+      return PayFeeStatus.PENDING;
     }
 
-    return PayFeeStatus.PENDING;
+    if (!Arrays.asList(SUCCESS,NOT_FOUND).contains(transactionResponse.getStatus())) {
+      return PayFeeStatus.PENDING;
+    }
+
+    cooperationAgreementEntity.getPayFeeEntity().setStatus(getStatusFromTransactionStatus(transactionResponse.getStatus()));
+
+    return payFeeStatus(cooperationAgreementRepository.save(cooperationAgreementEntity).getPayFeeEntity().getStatus());
   }
 
   private PayFeeStatus payFeeStatus(PayFeeEntity.Status status){
@@ -54,6 +62,14 @@ public class CooperationAgreementService {
       case PENDING ->  PayFeeStatus.PENDING;
       case CONFIRMED -> PayFeeStatus.CONFIRMED;
       case NULL -> PayFeeStatus.NULL;
+    };
+  }
+
+  private PayFeeEntity.Status getStatusFromTransactionStatus(String transactionStatus){
+    return switch (transactionStatus){
+      case SUCCESS ->  CONFIRMED;
+      case NOT_FOUND -> NULL;
+      default -> throw new RuntimeException("invalid");
     };
   }
 }
