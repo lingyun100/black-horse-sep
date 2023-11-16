@@ -52,4 +52,19 @@ class CooperationAgreementControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.status", equalTo("NULL")));
   }
+
+  @SneakyThrows
+  @Test
+  void should_return_status_NULL_and_500_when_confirm_pay_fee_given_PENDING_from_service() {
+    when(cooperationAgreementService.confirmPayFee("CA001", "S0001"))
+        .thenReturn(PayFeeStatus.PENDING);
+
+    mockMvc
+        .perform(
+            post(COOPERATION_AGREEMENT_BASE + "/" + "CA001" + PAY_FEE_CONFIRMATION)
+                .content("{\"serialId\":\"S0001\"}")
+                .contentType(APPLICATION_JSON))
+        .andExpect(status().is5xxServerError())
+        .andExpect(jsonPath("$.status", equalTo("PENDING")));
+  }
 }

@@ -32,7 +32,10 @@ public class CooperationAgreementController {
     PayFeeStatus payFeeStatus = cooperationAgreementService.confirmPayFee(cid, serialId);
     if (PayFeeStatus.NULL == payFeeStatus) {
       response.setStatus(HttpStatus.BAD_REQUEST.value());
+    } else if (PayFeeStatus.PENDING == payFeeStatus) {
+      response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
     return new PayFeeConfirmationResponse(payFeeStatus.name());
   }
 }
