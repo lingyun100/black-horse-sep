@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>black-horse-sep</artifactId>
+    <artifactId>cooperation_service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>black-horse-sep</name>
+    <name>cooperation_service</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>17</java.version>
