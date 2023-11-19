@@ -1,9 +1,37 @@
-# black-horse-sep
+# “醇香塘”加盟服务平台
 
-# local visit API by swagger
-启动程序, 在命令行界面进入工程目录后执行以下命令
+## 加盟合作服务
+
+### 快速构建
+
+```shell
+cd ./black-horse-sep
+mvn clean install
+```
+
+### 本地运行
+#### 启动 PostgreSQL
+```shell
+cd ./black-horse-sep
+docker compose up
+```
+#### 启动程序
 ```shell
 mvn spring-boot:run
 ```
 
-通过swagger ui查看接口以及访问接口 http://localhost:8080/swagger-ui/index.html
+本地依赖环境：
+
+- Docker 20.10.21
+- OpenJDK 18.0.2
+
+本地初始化数据 `./docker/postgres/init.sql`
+
+### 清理 docker compose
+```shell
+cd ./black-horse-sep
+docker compose down
+```
+### Swagger
+
+http://localhost:8080/swagger-ui/index.html

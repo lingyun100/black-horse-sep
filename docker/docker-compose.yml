@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12.12
+    container_name: cooperation_db
+    restart: always
+    environment:
+      POSTGRES_USER: cooperation
+      POSTGRES_PASSWORD: cooperation
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db:
+    driver: local
